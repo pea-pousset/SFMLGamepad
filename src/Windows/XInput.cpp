@@ -90,14 +90,6 @@ float priv::XInput::getPosition(unsigned int gamepad, Gamepad::Control control)
         return state.Gamepad.bLeftTrigger * 100.f / 255.f;
     else if (control == Gamepad::Control::RightTrigger)
         return state.Gamepad.bRightTrigger * 100.f / 255.f;
-    else if (control == Gamepad::Control::Up)
-        return state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP ? 100.f : 0.f;
-    else if (control == Gamepad::Control::Down)
-        return state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN ? 100.f : 0.f;
-    else if (control == Gamepad::Control::Left)
-        return state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT ? 100.f : 0.f;
-    else if (control == Gamepad::Control::Right)
-        return state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT ? 100.f : 0.f;
 
     return 0.f;
 }

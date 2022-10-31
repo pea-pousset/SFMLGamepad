@@ -33,6 +33,14 @@
 #include <iostream>
 #include <cctype>
 
+#ifdef SFML_SYSTEM_WINDOWS
+    #define POVY_UP_DIR     0
+    #define POVY_DOWN_DIR   1
+#else
+    #define POVY_UP_DIR     1
+    #define POVY_DOWN_DIR   0
+#endif
+
 namespace sf
 {
 ////////////////////////////////////////////////////////////
@@ -337,7 +345,7 @@ bool priv::GamepadImpl::parseAttr(const std::string& attrStr, Infos& infos)
             {
                 case 1:
                     control.id = static_cast<int>(Joystick::PovY);
-                    control.dir = 1;
+                    control.dir = POVY_UP_DIR;
                     break;
                 case 2:
                     control.id = static_cast<int>(Joystick::PovX);
@@ -345,7 +353,7 @@ bool priv::GamepadImpl::parseAttr(const std::string& attrStr, Infos& infos)
                     break;
                 case 4:
                     control.id = static_cast<int>(Joystick::PovY);
-                    control.dir = 0;
+                    control.dir = POVY_DOWN_DIR;
                     break;
                 case 8:
                     control.id = static_cast<int>(Joystick::PovX);
