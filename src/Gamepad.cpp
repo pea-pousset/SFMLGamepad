@@ -67,7 +67,7 @@ bool Gamepad::isAvailable(unsigned int gamepad)
 ////////////////////////////////////////////////////////////
 bool Gamepad::isPressed(unsigned int gamepad, Control control, unsigned int deadzone)
 {
-    if (gamepad >= Joystick::Count)
+    if (gamepad >= Joystick::Count || control == Control::None)
         return false;
 
     if (deadzone > 100)
@@ -104,7 +104,7 @@ bool Gamepad::isPressed(unsigned int gamepad, Control control, unsigned int dead
 ////////////////////////////////////////////////////////////
 float Gamepad::getPosition(unsigned int gamepad, Control control)
 {
-    if (gamepad >= Joystick::Count)
+    if (gamepad >= Joystick::Count || control == Control::None)
         return 0.f;
 
     auto id = Joystick::getIdentification(gamepad);
@@ -145,7 +145,7 @@ float Gamepad::getPosition(unsigned int gamepad, Control control)
 ////////////////////////////////////////////////////////////
 bool Gamepad::hasControl(unsigned int gamepad, Control control)
 {
-    if (gamepad >= Joystick::Count)
+    if (gamepad >= Joystick::Count || control == Control::None)
         return false;
 
     auto id = Joystick::getIdentification(gamepad);

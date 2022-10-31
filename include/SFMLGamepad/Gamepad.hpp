@@ -42,6 +42,7 @@ class SFML_GAMEPAD_API Gamepad
 public:
     enum class Control
     {
+        None,           //!< No control
         A,              //!< A / Cross button
         B,              //!< B / Circle button
         X,              //!< X / Square button
