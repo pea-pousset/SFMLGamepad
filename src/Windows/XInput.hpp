@@ -97,8 +97,15 @@ private:
     /// \brief typedef for the XInputGetCapabilities function
     ///
     ////////////////////////////////////////////////////////////
-    typedef DWORD(_stdcall* XInputGetCapabilitiesEx_t)(DWORD a1, DWORD dwUserIndex, DWORD dwFlags,
+    typedef DWORD(WINAPI* XInputGetCapabilitiesEx_t)(DWORD a1, DWORD dwUserIndex, DWORD dwFlags,
                                                        XINPUT_CAPABILITIES_EX* pCapabilities);
+
+    ////////////////////////////////////////////////////////////
+    /// \brief typedef for the XInputGetState function
+    ///
+    ////////////////////////////////////////////////////////////
+    typedef DWORD(WINAPI* XInputGetState_t)(DWORD dwUserIndex, XINPUT_STATE *pState);
+
 
     ////////////////////////////////////////////////////////////
     /// \brief Undocumented XInput function that gives extra informations
@@ -107,9 +114,9 @@ private:
     ////////////////////////////////////////////////////////////
     static XInputGetCapabilitiesEx_t XInputGetCapabilitiesEx;
 
-
-    static HMODULE xinputHandle;            //!< XInput module handle
-    static int joy2xinpID[Joystick::Count]; //!< Maps joystick IDs against XInput controller IDs
+    static XInputGetState_t XInputGetState_;    //!< XInputGetState function
+    static HMODULE xinputHandle;                //!< XInput module handle
+    static int joy2xinpID[Joystick::Count];     //!< Maps joystick IDs against XInput controller IDs
 };
 
 }

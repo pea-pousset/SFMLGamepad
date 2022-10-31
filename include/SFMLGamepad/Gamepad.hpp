@@ -28,13 +28,7 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include <string>
-#include <SFML/Config.hpp>
-
-#if defined(API_EXPORTS)
-#define PUBLIC_API SFML_API_EXPORT
-#else
-#define PUBLIC_API SFML_API_IMPORT
-#endif
+#include <SFMLGamepad/Config.hpp>
 
 namespace sf
 {
@@ -43,7 +37,7 @@ namespace sf
 /// \brief Add mappings to sf::Joystick
 ///
 ////////////////////////////////////////////////////////////
-class PUBLIC_API Gamepad
+class SFML_GAMEPAD_API Gamepad
 {
 public:
     enum class Control
