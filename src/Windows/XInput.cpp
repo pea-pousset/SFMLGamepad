@@ -115,7 +115,7 @@ bool priv::XInput::init()
         }
 
         XInputGetState_ = reinterpret_cast<XInputGetState_t>(GetProcAddress(xinputHandle, "XInputGetState"));
-        if (XInputGetCapabilitiesEx == NULL)
+        if (XInputGetState_ == NULL)
         {
             std::cerr << "XInput: Unable to get 'XInputGetState' function" << std::endl;
             return false;
