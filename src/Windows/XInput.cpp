@@ -33,6 +33,7 @@ namespace sf
 {
 ////////////////////////////////////////////////////////////
 priv::XInput::XInputGetCapabilitiesEx_t priv::XInput::XInputGetCapabilitiesEx = NULL;
+priv::XInput::XInputGetState_t priv::XInput::XInputGetState_ = NULL;
 HMODULE priv::XInput::xinputHandle = 0;
 int priv::XInput::joy2xinpID[Joystick::Count] = { -1 };
 
@@ -52,7 +53,7 @@ bool priv::XInput::isXInput(unsigned int gamepad)
     int joyIdx = 0;
     for (DWORD xinpIdx = 0; xinpIdx < XUSER_MAX_COUNT; xinpIdx++)
     {
-        DWORD ret = XInputGetState(xinpIdx, &state);
+        DWORD ret = XInputGetState_(xinpIdx, &state);
         if (ret == ERROR_SUCCESS)
         {
             XInputGetCapabilitiesEx(1, xinpIdx, 0, &caps);
@@ -81,7 +82,7 @@ float priv::XInput::getPosition(unsigned int gamepad, Gamepad::Control control)
     XINPUT_STATE state;
     DWORD ret;
 
-    ret = XInputGetState(joy2xinpID[gamepad], &state);
+    ret = XInputGetState_(joy2xinpID[gamepad], &state);
     if (ret != ERROR_SUCCESS)
         return 0.f;
 
@@ -89,6 +90,14 @@ float priv::XInput::getPosition(unsigned int gamepad, Gamepad::Control control)
         return state.Gamepad.bLeftTrigger * 100.f / 255.f;
     else if (control == Gamepad::Control::RightTrigger)
         return state.Gamepad.bRightTrigger * 100.f / 255.f;
+    else if (control == Gamepad::Control::Up)
+        return state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP ? 100.f : 0.f;
+    else if (control == Gamepad::Control::Down)
+        return state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN ? 100.f : 0.f;
+    else if (control == Gamepad::Control::Left)
+        return state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT ? 100.f : 0.f;
+    else if (control == Gamepad::Control::Right)
+        return state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT ? 100.f : 0.f;
 
     return 0.f;
 }
@@ -113,9 +122,15 @@ bool priv::XInput::init()
             return false;
         }
 
+        XInputGetState_ = reinterpret_cast<XInputGetState_t>(GetProcAddress(xinputHandle, "XInputGetState"));
+        if (XInputGetState_ == NULL)
+        {
+            std::cerr << "XInput: Unable to get 'XInputGetState' function" << std::endl;
+            return false;
+        }
+
         XInputGetCapabilitiesEx = reinterpret_cast<XInputGetCapabilitiesEx_t>(
                                         GetProcAddress(xinputHandle, reinterpret_cast<char*>(108)));
-
         if (XInputGetCapabilitiesEx == NULL)
         {
             std::cerr << "XInput: Unable to get 'XInputGetCapabilitiesEx' function" << std::endl;

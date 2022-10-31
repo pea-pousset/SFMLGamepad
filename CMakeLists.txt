@@ -54,7 +54,7 @@ macro(set_option var default type docstring)
 endmacro()
 
 set_option(CMAKE_BUILD_TYPE Release STRING "Choose the type of build (Debug or Release)")
-set_option(BUILD_SHARED_LIBS TRUE BOOL "TRUE to build SFMLGamepad as shared library, FALSE to build it as static library")
+set_option(SFML_GAMEPAD_SHARED TRUE BOOL "TRUE to build SFMLGamepad as shared library, FALSE to build it as static library")
 set_option(BUILD_TEST_APP TRUE BOOL "Build the test application")
 
 set(CMAKE_CXX_STANDARD 17)
@@ -79,20 +79,18 @@ set(SFML_GAMEPAD_SOURCES
     src/GamepadImpl.cpp
 )
 
-if(BUILD_SHARED_LIBS)
+if(SFML_GAMEPAD_SHARED)
     add_library(sfml-gamepad SHARED ${SFML_GAMEPAD_SOURCES})
+    set_target_properties(sfml-gamepad PROPERTIES DEBUG_POSTFIX -d)
 else()
     add_library(sfml-gamepad STATIC ${SFML_GAMEPAD_SOURCES})
+    target_compile_definitions(sfml-gamepad PUBLIC SFML_GAMEPAD_STATIC)
 endif()
 
 set_target_properties(sfml-gamepad PROPERTIES
     VERSION ${PROJECT_VERSION}
     SOVERSION ${PROJECT_VERSION_MAJOR}
 )
-
-if(BUILD_SHARED_LIBS)
-    set_target_properties(sfml-gamepad PROPERTIES DEBUG_POSTFIX -d)
-endif()
 
 target_compile_definitions(sfml-gamepad PRIVATE API_EXPORTS)
 target_include_directories(sfml-gamepad PUBLIC include)
@@ -104,10 +102,6 @@ target_link_libraries(sfml-gamepad
 )
 
 if (WIN32)
-    target_link_libraries(sfml-gamepad
-        XInput
-    )
-
     target_sources(sfml-gamepad
         PRIVATE
         src/Windows/XInput.cpp
