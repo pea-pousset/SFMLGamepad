@@ -83,7 +83,9 @@ bool Gamepad::isPressed(unsigned int gamepad, Control control, unsigned int dead
     else if (info.type == impl::ControlType::Axis || info.type == impl::ControlType::Hat)
     {
 #ifdef SFML_SYSTEM_WINDOWS
-        if ((control == Control::LeftTrigger || control == Control::RightTrigger)
+        if ((control == Control::LeftTrigger || control == Control::RightTrigger ||
+            control == Control::Up || control == Control::Down ||
+            control == Control::Left || control == Control::Right)
             && priv::XInput::isXInput(gamepad))
         {
             return priv::XInput::getPosition(gamepad, control) >= deadzone;
@@ -117,7 +119,9 @@ float Gamepad::getPosition(unsigned int gamepad, Control control)
     else if (info.type == impl::ControlType::Axis || info.type == impl::ControlType::Hat)
     {
 #ifdef SFML_SYSTEM_WINDOWS
-        if ((control == Control::LeftTrigger || control == Control::RightTrigger)
+        if ((control == Control::LeftTrigger || control == Control::RightTrigger ||
+            control == Control::Up || control == Control::Down ||
+            control == Control::Left || control == Control::Right)
             && priv::XInput::isXInput(gamepad))
         {
             return priv::XInput::getPosition(gamepad, control);
