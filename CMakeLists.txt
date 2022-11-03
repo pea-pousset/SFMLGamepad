@@ -112,20 +112,43 @@ endif()
 # Generate test app
 ################################################################################
 if(BUILD_TEST_APP)
-    file(COPY test/coolvetica\ rg.otf DESTINATION ${PROJECT_BINARY_DIR})
-    file(COPY test/SDL_GameControllerDB/gamecontrollerdb.txt DESTINATION ${PROJECT_BINARY_DIR})
+    set(RESOURCE_FILES
+        test/coolvetica\ rg.otf
+        test/SDL_GameControllerDB/gamecontrollerdb.txt
+    )
 
-    add_executable(sfml-gamepad-test
+    add_executable(sfml-gamepad-test MACOSX_BUNDLE
         test/main.cpp
+        ${RESOURCE_FILES}
+    )
+
+    set_target_properties(sfml-gamepad-test PROPERTIES
+        RESOURCE "${RESOURCE_FILES}"
     )
 
     target_include_directories(sfml-gamepad-test PRIVATE test)
+
     target_link_libraries(sfml-gamepad-test
         sfml-system
         sfml-window
         sfml-graphics
         sfml-gamepad
     )
+
+    if(APPLE)
+        target_sources(sfml-gamepad-test PRIVATE
+            test/mac.mm
+        )
+
+        set_target_properties(sfml-gamepad-test PROPERTIES
+            MAXOSX_BUBDLE            TRUE
+            MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/test/cmake/MacOSXBundleInfo.plist.in
+        )
+    else()
+        file(COPY test/coolvetica\ rg.otf DESTINATION ${PROJECT_BINARY_DIR})
+        file(COPY test/SDL_GameControllerDB/gamecontrollerdb.txt DESTINATION ${PROJECT_BINARY_DIR})
+    endif()
+
 endif()
 
 ################################################################################

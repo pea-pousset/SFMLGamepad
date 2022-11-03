@@ -25,7 +25,7 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <GamepadImpl.hpp>
+#include "GamepadImpl.hpp"
 
 #include <SFML/Config.hpp>
 
@@ -246,7 +246,7 @@ void priv::GamepadImpl::parseLine(const std::string& line)
         if (infos.platform != Platform::Windows)
             return;
 #elif defined(SFML_SYSTEM_MACOS)
-        if (infos.platform != Platform::Apple)
+        if (infos.platform != Platform::Mac)
             return;
 #elif defined(SFML_SYSTEM_ANDROID)
         if (infos.platform != Platform::Android)
