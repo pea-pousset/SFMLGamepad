@@ -60,7 +60,7 @@ set_option(BUILD_TEST_APP TRUE BOOL "Build the test application")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-if (MSVC)
+if (MSVC OR XCODE)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG   ${PROJECT_BINARY_DIR})
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PROJECT_BINARY_DIR})
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG   ${PROJECT_BINARY_DIR})
@@ -117,7 +117,7 @@ if(BUILD_TEST_APP)
         test/SDL_GameControllerDB/gamecontrollerdb.txt
     )
 
-    add_executable(sfml-gamepad-test MACOSX_BUNDLE
+    add_executable(sfml-gamepad-test
         test/main.cpp
         ${RESOURCE_FILES}
     )
@@ -141,7 +141,7 @@ if(BUILD_TEST_APP)
         )
 
         set_target_properties(sfml-gamepad-test PROPERTIES
-            MAXOSX_BUBDLE            TRUE
+            MACOSX_BUNDLE            TRUE
             MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/test/cmake/MacOSXBundleInfo.plist.in
         )
     else()

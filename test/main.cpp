@@ -92,8 +92,6 @@ struct ControlInfos
     sf::Vector2f position;
 };
 
-#include <iostream>
-#include <filesystem>
 int main()
 {
     const ControlInfos controlInfos[] =
