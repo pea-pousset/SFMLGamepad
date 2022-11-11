@@ -31,5 +31,8 @@
 	<key>NSHumanReadableCopyright</key>
 	<string>${MACOSX_BUNDLE_COPYRIGHT}</string>
 	<key>NSHighResolutionCapable</key>
-	<false/></dict>
+	<false/>
+	<key>GCSupportsControllerUserInteraction</key>
+	<true/>
+</dict>
 </plist>

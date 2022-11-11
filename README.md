@@ -36,7 +36,8 @@ It is possible to load several databases, for example using an embedded string a
 
 ## Status
 
-* Untested on following platforms : macOS, iOS, Android.
+* macOS needs testing with a lot of controllers since I had to use my own way of handling joysticks on this platform
+* Untested on following platforms : iOS, Android.
 * The reference database provides similar products with different revision IDs, but the SFML provides no way to dinstinguish between them.
 * THe reference database contains axis with values > 6, they are not handled
 

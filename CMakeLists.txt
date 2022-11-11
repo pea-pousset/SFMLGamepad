@@ -77,7 +77,17 @@ find_package(SFML 2.5 COMPONENTS system window graphics REQUIRED)
 set(SFML_GAMEPAD_SOURCES
     src/Gamepad.cpp
     src/GamepadImpl.cpp
+    src/GamepadImpl.hpp
+    include/SFMLGamepad/Config.hpp
+    include/SFMLGamepad/Gamepad.hpp
 )
+
+if(APPLE)
+    list(APPEND SFML_GAMEPAD_SOURCES
+        src/Apple/Controller.hpp
+        src/Apple/Controller.mm
+    )
+endif()
 
 if(SFML_GAMEPAD_SHARED)
     add_library(sfml-gamepad SHARED ${SFML_GAMEPAD_SOURCES})
@@ -92,6 +102,11 @@ set_target_properties(sfml-gamepad PROPERTIES
     SOVERSION ${PROJECT_VERSION_MAJOR}
 )
 
+if(APPLE)
+    find_library(IOKIT IOKit)
+    target_link_libraries(sfml-gamepad ${IOKIT})
+endif()
+
 target_compile_definitions(sfml-gamepad PRIVATE API_EXPORTS)
 target_include_directories(sfml-gamepad PUBLIC include)
 target_include_directories(sfml-gamepad PRIVATE src)
@@ -105,6 +120,7 @@ if (WIN32)
     target_sources(sfml-gamepad
         PRIVATE
         src/Windows/XInput.cpp
+        src/Windows/XInput.hpp
     )
 endif()
 

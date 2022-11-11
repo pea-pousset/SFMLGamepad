@@ -29,9 +29,14 @@
 
 #include <SFML/Config.hpp>
 
+#include <functional>
 #include <fstream>
 #include <iostream>
 #include <cctype>
+
+#ifdef SFML_SYSTEM_MACOS
+    #include "Apple/Controller.hpp"
+#endif
 
 #ifdef SFML_SYSTEM_WINDOWS
     #define POVY_UP_DIR     0
@@ -40,6 +45,22 @@
     #define POVY_UP_DIR     1
     #define POVY_DOWN_DIR   0
 #endif
+
+namespace
+{
+using namespace std::placeholders;
+
+#ifdef SFML_SYSTEM_MACOS
+using ctrl = sf::priv::Controller;
+auto getIdentification = std::bind(&ctrl::getIdentification, ctrl::instance(), _1);
+auto isConnected       = std::bind(&ctrl::isConnected,       ctrl::instance(), _1);
+#else
+auto getIdentification = std::bind(sf::Joystick::getIdentification, _1);
+auto isConnected       = std::bind(sf::Joystick::isConnected,       _1);
+#endif
+
+}
+
 
 namespace sf
 {
@@ -93,14 +114,15 @@ bool priv::GamepadImpl::isAvailable(unsigned int gamepad)
     if (gamepad >= sf::Joystick::Count)
         return false;
 
-    if (!sf::Joystick::isConnected(gamepad))
+    if (!isConnected(gamepad))
         return false;
 
-    auto vid = _db.find(sf::Joystick::getIdentification(gamepad).vendorId);
+    auto id = getIdentification(gamepad);
+    auto vid = _db.find(id.vendorId);
     if (vid == _db.end())
         return false;
 
-    auto pid = vid->second.find(sf::Joystick::getIdentification(gamepad).productId);
+    auto pid = vid->second.find(id.productId);
     if (pid == vid->second.end())
         return false;
 
