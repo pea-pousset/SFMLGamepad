@@ -1,6 +1,12 @@
 #include <SFML/Graphics.hpp>
 #include <SFMLGamepad/Gamepad.hpp>
 
+#ifdef __APPLE__
+extern const std::string& resourcePath();
+#else
+const std::string resourcePath() { return {}; }
+#endif
+
 class ControlState final : public sf::Drawable, public sf::Transformable
 {
 public:
@@ -11,7 +17,7 @@ public:
 
     ControlState()
     {
-        font.loadFromFile("coolvetica rg.otf");
+        font.loadFromFile(resourcePath() + "coolvetica rg.otf");
         text.setFont(font);
         text.setCharacterSize(15);
         text.setFillColor(sf::Color::White);
@@ -124,7 +130,7 @@ int main()
         { "Misc 1",         sf::Gamepad::Control::Misc1,         sf::Vector2f(335, 380) },
     };
 
-    sf::Gamepad::loadMappingFromFile("gamecontrollerdb.txt");
+    sf::Gamepad::loadMappingFromFile(resourcePath() + "gamecontrollerdb.txt");
     sf::RenderWindow window(sf::VideoMode(640, 480), "SFMLGamepad Test", sf::Style::Titlebar | sf::Style::Close);
     sf::Font font;
     sf::Text connectionStatus;
@@ -133,7 +139,7 @@ int main()
     int gamepad = 0;
 
     window.setVerticalSyncEnabled(true);
-    font.loadFromFile("coolvetica rg.otf");
+    font.loadFromFile(resourcePath() + "coolvetica rg.otf");
     connectionStatus.setCharacterSize(15);
     connectionStatus.setPosition(10, 460);
     connectionStatus.setFont(font);

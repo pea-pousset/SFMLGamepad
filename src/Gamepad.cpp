@@ -31,11 +31,32 @@
 #include <SFML/Window/Joystick.hpp>
 #include <SFML/Config.hpp>
 
-#ifdef SFML_SYSTEM_WINDOWS
-#include <Windows/XInput.hpp>
+#if defined(SFML_SYSTEM_WINDOWS)
+    #include <Windows/XInput.hpp>
+#elif defined(SFML_SYSTEM_MACOS)
+    #include <Apple/Controller.hpp>
 #endif
 
+#include <functional>
 #include <cmath>
+
+namespace
+{
+using namespace std::placeholders;
+
+#ifdef SFML_SYSTEM_MACOS
+using ctrl = sf::priv::Controller;
+auto getIdentification = std::bind(&ctrl::getIdentification, ctrl::instance(), _1);
+auto getAxisPosition   = std::bind(&ctrl::getAxisPosition,   ctrl::instance(), _1, _2);
+auto isButtonPressed   = std::bind(&ctrl::isButtonPressed,   ctrl::instance(), _1, _2);
+#else
+auto getIdentification = std::bind(sf::Joystick::getIdentification, _1);
+auto getAxisPosition   = std::bind(sf::Joystick::getAxisPosition,   _1, _2);
+auto isButtonPressed   = std::bind(sf::Joystick::isButtonPressed,   _1, _2);
+#endif
+
+}
+
 
 namespace sf
 {
@@ -73,12 +94,12 @@ bool Gamepad::isPressed(unsigned int gamepad, Control control, unsigned int dead
     if (deadzone > 100)
         deadzone = 100;
 
-    auto id = Joystick::getIdentification(gamepad);
-    auto& info = impl::getControlInfo(control, id);
+    auto id = getIdentification(gamepad);
+    const auto& info = impl::getControlInfo(control, id);
 
     if (info.type == impl::ControlType::Button)
     {
-        return Joystick::isButtonPressed(gamepad, info.id);
+        return isButtonPressed(gamepad, info.id);
     }
     else if (info.type == impl::ControlType::Axis || info.type == impl::ControlType::Hat)
     {
@@ -90,7 +111,7 @@ bool Gamepad::isPressed(unsigned int gamepad, Control control, unsigned int dead
         }
 #endif
 
-        auto val = Joystick::getAxisPosition(gamepad, static_cast<Joystick::Axis>(info.id));
+        auto val = getAxisPosition(gamepad, static_cast<Joystick::Axis>(info.id));
         if (info.dir)
             return val <= -static_cast<int>(deadzone);
         else
@@ -107,12 +128,12 @@ float Gamepad::getPosition(unsigned int gamepad, Control control)
     if (gamepad >= Joystick::Count || control == Control::None)
         return 0.f;
 
-    auto id = Joystick::getIdentification(gamepad);
-    auto& info = impl::getControlInfo(control, id);
+    auto id = getIdentification(gamepad);
+    const auto& info = impl::getControlInfo(control, id);
 
     if (info.type == impl::ControlType::Button)
     {
-        return Joystick::isButtonPressed(gamepad, info.id) ? 100.f : 0.f;
+        return isButtonPressed(gamepad, info.id) ? 100.f : 0.f;
     }
     else if (info.type == impl::ControlType::Axis || info.type == impl::ControlType::Hat)
     {
@@ -123,7 +144,7 @@ float Gamepad::getPosition(unsigned int gamepad, Control control)
             return priv::XInput::getPosition(gamepad, control);
         }
 #endif
-        auto val = Joystick::getAxisPosition(gamepad, static_cast<Joystick::Axis>(info.id));
+        auto val = getAxisPosition(gamepad, static_cast<Joystick::Axis>(info.id));
         if (info.dir)
         {
             if (val > 0.f)
@@ -148,7 +169,7 @@ bool Gamepad::hasControl(unsigned int gamepad, Control control)
     if (gamepad >= Joystick::Count || control == Control::None)
         return false;
 
-    auto id = Joystick::getIdentification(gamepad);
+    auto id = getIdentification(gamepad);
     auto& info = impl::getControlInfo(control, id);
 
     return info.type != impl::ControlType::None;

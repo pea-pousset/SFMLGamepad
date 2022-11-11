@@ -60,7 +60,7 @@ set_option(BUILD_TEST_APP TRUE BOOL "Build the test application")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-if (MSVC)
+if (MSVC OR XCODE)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG   ${PROJECT_BINARY_DIR})
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PROJECT_BINARY_DIR})
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG   ${PROJECT_BINARY_DIR})
@@ -77,7 +77,17 @@ find_package(SFML 2.5 COMPONENTS system window graphics REQUIRED)
 set(SFML_GAMEPAD_SOURCES
     src/Gamepad.cpp
     src/GamepadImpl.cpp
+    src/GamepadImpl.hpp
+    include/SFMLGamepad/Config.hpp
+    include/SFMLGamepad/Gamepad.hpp
 )
+
+if(APPLE)
+    list(APPEND SFML_GAMEPAD_SOURCES
+        src/Apple/Controller.hpp
+        src/Apple/Controller.mm
+    )
+endif()
 
 if(SFML_GAMEPAD_SHARED)
     add_library(sfml-gamepad SHARED ${SFML_GAMEPAD_SOURCES})
@@ -92,6 +102,11 @@ set_target_properties(sfml-gamepad PROPERTIES
     SOVERSION ${PROJECT_VERSION_MAJOR}
 )
 
+if(APPLE)
+    find_library(IOKIT IOKit)
+    target_link_libraries(sfml-gamepad ${IOKIT})
+endif()
+
 target_compile_definitions(sfml-gamepad PRIVATE API_EXPORTS)
 target_include_directories(sfml-gamepad PUBLIC include)
 target_include_directories(sfml-gamepad PRIVATE src)
@@ -105,6 +120,7 @@ if (WIN32)
     target_sources(sfml-gamepad
         PRIVATE
         src/Windows/XInput.cpp
+        src/Windows/XInput.hpp
     )
 endif()
 
@@ -112,20 +128,43 @@ endif()
 # Generate test app
 ################################################################################
 if(BUILD_TEST_APP)
-    file(COPY test/coolvetica\ rg.otf DESTINATION ${PROJECT_BINARY_DIR})
-    file(COPY test/SDL_GameControllerDB/gamecontrollerdb.txt DESTINATION ${PROJECT_BINARY_DIR})
+    set(RESOURCE_FILES
+        test/coolvetica\ rg.otf
+        test/SDL_GameControllerDB/gamecontrollerdb.txt
+    )
 
     add_executable(sfml-gamepad-test
         test/main.cpp
+        ${RESOURCE_FILES}
+    )
+
+    set_target_properties(sfml-gamepad-test PROPERTIES
+        RESOURCE "${RESOURCE_FILES}"
     )
 
     target_include_directories(sfml-gamepad-test PRIVATE test)
+
     target_link_libraries(sfml-gamepad-test
         sfml-system
         sfml-window
         sfml-graphics
         sfml-gamepad
     )
+
+    if(APPLE)
+        target_sources(sfml-gamepad-test PRIVATE
+            test/mac.mm
+        )
+
+        set_target_properties(sfml-gamepad-test PROPERTIES
+            MACOSX_BUNDLE            TRUE
+            MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/test/cmake/MacOSXBundleInfo.plist.in
+        )
+    else()
+        file(COPY test/coolvetica\ rg.otf DESTINATION ${PROJECT_BINARY_DIR})
+        file(COPY test/SDL_GameControllerDB/gamecontrollerdb.txt DESTINATION ${PROJECT_BINARY_DIR})
+    endif()
+
 endif()
 
 ################################################################################
